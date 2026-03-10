@@ -1,6 +1,8 @@
 package com.hikma.stagiaires.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,8 @@ public class JwtService {
     @Value("${app.jwt.refresh-token-expiration}")
     private long refreshTokenExpiration;
 
+    // ── Génération ───────────────────────────────────────────────────
+
     public String generateAccessToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails, accessTokenExpiration);
     }
@@ -36,20 +40,26 @@ public class JwtService {
         return generateToken(claims, userDetails, refreshTokenExpiration);
     }
 
-    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
+    private String generateToken(Map<String, Object> extraClaims,
+                                 UserDetails userDetails,
+                                 long expiration) {
         return Jwts.builder()
-                .claims(extraClaims)
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey())
+                .setClaims(extraClaims)                          // 0.11.x : setClaims()
+                .setSubject(userDetails.getUsername())           // 0.11.x : setSubject()
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
+    // ── Validation ───────────────────────────────────────────────────
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
+
+    // ── Extraction ───────────────────────────────────────────────────
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -69,11 +79,11 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
+        return Jwts.parserBuilder()              // 0.11.x : parserBuilder()
+                .setSigningKey(getSigningKey())
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseClaimsJws(token)           // 0.11.x : parseClaimsJws()
+                .getBody();
     }
 
     private SecretKey getSigningKey() {
