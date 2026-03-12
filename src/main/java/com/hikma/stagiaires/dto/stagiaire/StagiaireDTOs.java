@@ -70,6 +70,7 @@ public class StagiaireDTOs {
 
     @Data
     public static class SearchFilter {
+        private String search;          // ← AJOUTÉ : recherche textuelle (nom, email, école...)
         private String departement;
         private Double minScore;
         private List<String> competences;
@@ -99,7 +100,7 @@ public class StagiaireDTOs {
         private EducationLevel level;
         private String departement;
         private String tuteurId;
-        private String tuteurName;      // Nom du tuteur (résolu)
+        private String tuteurName;
         private LocalDate startDate;
         private LocalDate endDate;
         private Integer durationMonths;

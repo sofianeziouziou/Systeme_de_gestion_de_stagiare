@@ -27,12 +27,13 @@ public interface StagiaireRepository extends MongoRepository<Stagiaire, String> 
 
     long countByDepartementAndDeletedFalse(String departement);
 
-    // Top stagiaires par score
     List<Stagiaire> findTop10ByDeletedFalseOrderByGlobalScoreDesc();
 
-    // Moyenne par département (via aggregation dans StagiaireService)
     @Query("{ 'deleted': false, 'departement': ?0 }")
     List<Stagiaire> findByDepartementForAggregation(String departement);
 
     boolean existsByEmailAndDeletedFalse(String email);
+
+    // ── AJOUTÉ : pour GET /api/v1/stagiaires/me ──────────────────────────
+    Optional<Stagiaire> findByUserId(String userId);
 }

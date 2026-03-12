@@ -31,7 +31,14 @@ public class JwtService {
     // ── Génération ───────────────────────────────────────────────────
 
     public String generateAccessToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails, accessTokenExpiration);
+        Map<String, Object> claims = new HashMap<>();
+        // Ajoute le rôle dans le token JWT
+        String role = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(a -> a.getAuthority().replace("ROLE_", ""))
+                .orElse("RH");
+        claims.put("role", role);
+        return generateToken(claims, userDetails, accessTokenExpiration);
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
@@ -44,8 +51,8 @@ public class JwtService {
                                  UserDetails userDetails,
                                  long expiration) {
         return Jwts.builder()
-                .setClaims(extraClaims)                          // 0.11.x : setClaims()
-                .setSubject(userDetails.getUsername())           // 0.11.x : setSubject()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -79,10 +86,10 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()              // 0.11.x : parserBuilder()
+        return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
-                .parseClaimsJws(token)           // 0.11.x : parseClaimsJws()
+                .parseClaimsJws(token)
                 .getBody();
     }
 

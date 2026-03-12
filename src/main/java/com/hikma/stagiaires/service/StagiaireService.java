@@ -14,11 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.time.temporal.ChronoUnit;
 
 @Slf4j
 @Service
@@ -64,9 +63,15 @@ public class StagiaireService {
     }
 
     public StagiaireResponse getById(String id) {
-        Stagiaire s = findActiveById(id);
-        return toResponse(s);
+        return toResponse(findActiveById(id));
     }
+
+    // ── NOUVEAU : profil du stagiaire connecté ───────────────────────────
+    public StagiaireResponse getByUserId(String userId) {
+        Stagiaire stagiaire = stagiaireRepository.findByUserId(userId).orElseThrow(() -> new NoSuchElementException(
+                "Aucun profil stagiaire trouvé pour cet utilisateur"));
+        return toResponse(stagiaire);
+    }   // ← accolade fermante correcte
 
     public PagedResponse search(SearchFilter filter) {
         Query query = new Query();
@@ -99,12 +104,30 @@ public class StagiaireService {
         if (StringUtils.hasText(filter.getTuteurId()))
             query.addCriteria(Criteria.where("tuteurId").is(filter.getTuteurId()));
 
+        // ── Recherche textuelle (nom, email, école) ──────────────────────
+        if (StringUtils.hasText(filter.getSearch())) {
+            String regex = filter.getSearch();
+            query.addCriteria(new Criteria().orOperator(
+                    Criteria.where("firstName").regex(regex, "i"),
+                    Criteria.where("lastName").regex(regex, "i"),
+                    Criteria.where("email").regex(regex, "i"),
+                    Criteria.where("school").regex(regex, "i"),
+                    Criteria.where("departement").regex(regex, "i")
+            ));
+        }
+
         long total = mongoTemplate.count(query, Stagiaire.class);
-        Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize(), Sort.by("globalScore").descending());
+        Pageable pageable = PageRequest.of(
+                filter.getPage(),
+                filter.getSize(),
+                Sort.by("globalScore").descending()
+        );
         query.with(pageable);
 
         List<Stagiaire> stagiaires = mongoTemplate.find(query, Stagiaire.class);
-        List<StagiaireResponse> responses = stagiaires.stream().map(this::toResponse).collect(Collectors.toList());
+        List<StagiaireResponse> responses = stagiaires.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
 
         PagedResponse paged = new PagedResponse();
         paged.setContent(responses);
@@ -118,19 +141,19 @@ public class StagiaireService {
     public StagiaireResponse update(String id, UpdateRequest req, String updatedByUserId) {
         Stagiaire s = findActiveById(id);
 
-        if (req.getFirstName() != null) s.setFirstName(req.getFirstName());
-        if (req.getLastName() != null) s.setLastName(req.getLastName());
-        if (req.getPhone() != null) s.setPhone(req.getPhone());
-        if (req.getSchool() != null) s.setSchool(req.getSchool());
-        if (req.getFieldOfStudy() != null) s.setFieldOfStudy(req.getFieldOfStudy());
-        if (req.getLevel() != null) s.setLevel(req.getLevel());
-        if (req.getDepartement() != null) s.setDepartement(req.getDepartement());
-        if (req.getTuteurId() != null) s.setTuteurId(req.getTuteurId());
-        if (req.getStartDate() != null) s.setStartDate(req.getStartDate());
-        if (req.getEndDate() != null) s.setEndDate(req.getEndDate());
-        if (req.getTechnicalSkills() != null) s.setTechnicalSkills(req.getTechnicalSkills());
-        if (req.getSoftSkills() != null) s.setSoftSkills(req.getSoftSkills());
-        if (req.getStatus() != null) s.setStatus(req.getStatus());
+        if (req.getFirstName()      != null) s.setFirstName(req.getFirstName());
+        if (req.getLastName()       != null) s.setLastName(req.getLastName());
+        if (req.getPhone()          != null) s.setPhone(req.getPhone());
+        if (req.getSchool()         != null) s.setSchool(req.getSchool());
+        if (req.getFieldOfStudy()   != null) s.setFieldOfStudy(req.getFieldOfStudy());
+        if (req.getLevel()          != null) s.setLevel(req.getLevel());
+        if (req.getDepartement()    != null) s.setDepartement(req.getDepartement());
+        if (req.getTuteurId()       != null) s.setTuteurId(req.getTuteurId());
+        if (req.getStartDate()      != null) s.setStartDate(req.getStartDate());
+        if (req.getEndDate()        != null) s.setEndDate(req.getEndDate());
+        if (req.getTechnicalSkills()!= null) s.setTechnicalSkills(req.getTechnicalSkills());
+        if (req.getSoftSkills()     != null) s.setSoftSkills(req.getSoftSkills());
+        if (req.getStatus()         != null) s.setStatus(req.getStatus());
 
         Stagiaire saved = stagiaireRepository.save(s);
         auditLogService.log(updatedByUserId, "UPDATE", "STAGIAIRE", id, null);
@@ -151,6 +174,7 @@ public class StagiaireService {
         return toResponse(stagiaireRepository.save(s));
     }
 
+    // ── AJOUTÉ : méthode uploadPhoto ─────────────────────────────────────
     public StagiaireResponse uploadPhoto(String id, MultipartFile file, String userId) {
         Stagiaire s = findActiveById(id);
         String url = fileStorageService.uploadFile(file, "photos/" + id);
@@ -212,7 +236,6 @@ public class StagiaireService {
         r.setCreatedAt(s.getCreatedAt());
         r.setUpdatedAt(s.getUpdatedAt());
 
-        // Résoudre le nom du tuteur
         if (s.getTuteurId() != null) {
             userRepository.findById(s.getTuteurId()).ifPresent(u ->
                     r.setTuteurName(u.getFirstName() + " " + u.getLastName()));

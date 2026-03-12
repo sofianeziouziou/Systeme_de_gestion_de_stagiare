@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +25,52 @@ public class StagiaireController {
 
     private final StagiaireService stagiaireService;
 
+    // ────────────────────────────────────────────────────────────────
+    // NOUVEAU : GET /api/v1/stagiaires
+    //   - RH       → tous les stagiaires (paginé, filtre search/tuteurId)
+    //   - TUTEUR   → uniquement SES stagiaires (tuteurId injecté auto)
+    // ────────────────────────────────────────────────────────────────
+    @GetMapping
+    @PreAuthorize("hasAnyRole('RH', 'TUTEUR')")
+    @Operation(summary = "Liste des stagiaires (paginée)")
+    public ResponseEntity<PagedResponse> getAll(
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false)    String search,
+            @RequestParam(required = false)    String tuteurId,
+            @AuthenticationPrincipal User currentUser) {
+
+        SearchFilter filter = new SearchFilter();
+        filter.setPage(page);
+        filter.setSize(size);
+        filter.setSearch(search);
+
+        // Tuteur ne voit que ses propres stagiaires
+        if ("TUTEUR".equals(currentUser.getRole().name())) {
+            filter.setTuteurId(currentUser.getId());
+        } else {
+            // RH peut filtrer par tuteur via query param
+            filter.setTuteurId(tuteurId);
+        }
+
+        return ResponseEntity.ok(stagiaireService.search(filter));
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // NOUVEAU : GET /api/v1/stagiaires/me
+    //   - STAGIAIRE → son propre profil lié à son compte User
+    // ────────────────────────────────────────────────────────────────
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('STAGIAIRE')")
+    @Operation(summary = "Profil du stagiaire connecté")
+    public ResponseEntity<StagiaireResponse> getMe(
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(stagiaireService.getByUserId(currentUser.getId()));
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // EXISTANT (inchangé)
+    // ────────────────────────────────────────────────────────────────
     @PostMapping
     @PreAuthorize("hasRole('RH')")
     @Operation(summary = "Créer un stagiaire")
@@ -46,15 +94,14 @@ public class StagiaireController {
     public ResponseEntity<PagedResponse> search(
             @ModelAttribute SearchFilter filter,
             @AuthenticationPrincipal User currentUser) {
-        // Tuteur ne voit que ses stagiaires
-        if (currentUser.getRole().name().equals("TUTEUR")) {
+        if ("TUTEUR".equals(currentUser.getRole().name())) {
             filter.setTuteurId(currentUser.getId());
         }
         return ResponseEntity.ok(stagiaireService.search(filter));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('RH')")
+    @PreAuthorize("hasAnyRole('RH', 'STAGIAIRE')")
     @Operation(summary = "Modifier un stagiaire")
     public ResponseEntity<StagiaireResponse> update(
             @PathVariable String id,
@@ -74,7 +121,7 @@ public class StagiaireController {
     }
 
     @PostMapping("/{id}/cv")
-    @PreAuthorize("hasRole('RH')")
+    @PreAuthorize("hasAnyRole('RH', 'STAGIAIRE')")
     @Operation(summary = "Uploader le CV (PDF)")
     public ResponseEntity<StagiaireResponse> uploadCv(
             @PathVariable String id,
