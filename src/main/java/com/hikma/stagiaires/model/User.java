@@ -39,6 +39,12 @@ public class User implements UserDetails {
 
     private Role role; // RH, TUTEUR, STAGIAIRE
 
+    // ── NOUVEAU : statut de compte ────────────────────────────────────────
+    @Builder.Default
+    private AccountStatus accountStatus = AccountStatus.EN_ATTENTE;
+    // RH → APPROUVE directement
+    // TUTEUR / STAGIAIRE → EN_ATTENTE jusqu'à approbation RH
+
     @Builder.Default
     private boolean enabled = true;
 
@@ -54,7 +60,7 @@ public class User implements UserDetails {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    // ─── UserDetails ─────────────────────────────────────────────────
+    // ─── UserDetails ─────────────────────────────────────────────────────
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -67,22 +73,17 @@ public class User implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return accountNonLocked;
-    }
+    public boolean isAccountNonLocked() { return accountNonLocked; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+    public boolean isCredentialsNonExpired() { return true; }
 
+    // ── isEnabled tient compte du statut ─────────────────────────────────
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return enabled && AccountStatus.APPROUVE.equals(accountStatus);
     }
 }

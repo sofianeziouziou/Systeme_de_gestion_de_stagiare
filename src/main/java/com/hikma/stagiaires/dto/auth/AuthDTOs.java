@@ -40,6 +40,10 @@ public class AuthDTOs {
         private String tokenType = "Bearer";
         private UserInfo user;
 
+        // ── NOUVEAU ──────────────────────────────────────────────────────
+        private boolean pendingApproval = false;   // true si EN_ATTENTE
+        private String message;                    // message informatif
+
         @Data
         public static class UserInfo {
             private String id;
@@ -48,6 +52,7 @@ public class AuthDTOs {
             private String lastName;
             private String role;
             private String photoUrl;
+            private String accountStatus;          // EN_ATTENTE / APPROUVE / REFUSE
         }
     }
 
