@@ -33,7 +33,7 @@ public interface StagiaireRepository extends MongoRepository<Stagiaire, String> 
 
     // ── Top 10 par score ──────────────────────────────────────────────────
     List<Stagiaire> findTop10ByDeletedFalseOrderByGlobalScoreDesc();
-
+    List<Stagiaire> findByTuteurIdAndDeletedFalse(String tuteurId);
     // ── Agrégation par département ────────────────────────────────────────
     @Query("{ 'departement': ?0, 'deleted': false }")
     List<Stagiaire> findByDepartementForAggregation(String departement);
