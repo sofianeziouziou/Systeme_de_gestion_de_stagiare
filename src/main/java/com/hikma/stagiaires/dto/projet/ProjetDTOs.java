@@ -1,8 +1,8 @@
 // DESTINATION : src/main/java/com/hikma/stagiaires/dto/projet/ProjetDTOs.java
 package com.hikma.stagiaires.dto.projet;
 
-import com.hikma.stagiaires.model.ProjetStatus;
-import com.hikma.stagiaires.model.Projet.TuteurAcceptation;
+import com.hikma.stagiaires.model.projet.ProjetStatus;
+import com.hikma.stagiaires.model.projet.Projet.TuteurAcceptation;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 

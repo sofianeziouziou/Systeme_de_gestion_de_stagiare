@@ -1,6 +1,6 @@
 package com.hikma.stagiaires.repository;
 
-import com.hikma.stagiaires.model.Notification;
+import com.hikma.stagiaires.model.notification.Notification;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

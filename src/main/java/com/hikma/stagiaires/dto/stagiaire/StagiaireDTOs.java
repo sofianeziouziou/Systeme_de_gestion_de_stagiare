@@ -1,10 +1,10 @@
 // DESTINATION : src/main/java/com/hikma/stagiaires/dto/stagiaire/StagiaireDTOs.java
 package com.hikma.stagiaires.dto.stagiaire;
 
-import com.hikma.stagiaires.model.Badge;
-import com.hikma.stagiaires.model.CvData;
-import com.hikma.stagiaires.model.EducationLevel;
-import com.hikma.stagiaires.model.StagiaireStatus;
+import com.hikma.stagiaires.model.stagiaire.Badge;
+import com.hikma.stagiaires.model.stagiaire.CvData;
+import com.hikma.stagiaires.model.stagiaire.EducationLevel;
+import com.hikma.stagiaires.model.stagiaire.StagiaireStatus;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 

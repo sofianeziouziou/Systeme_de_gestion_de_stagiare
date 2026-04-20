@@ -1,7 +1,7 @@
 package com.hikma.stagiaires.repository;
 
-import com.hikma.stagiaires.model.Stagiaire;
-import com.hikma.stagiaires.model.StagiaireStatus;
+import com.hikma.stagiaires.model.stagiaire.Stagiaire;
+import com.hikma.stagiaires.model.stagiaire.StagiaireStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 

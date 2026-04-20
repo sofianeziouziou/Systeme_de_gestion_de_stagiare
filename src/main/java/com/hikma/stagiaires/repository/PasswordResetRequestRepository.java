@@ -1,6 +1,6 @@
 package com.hikma.stagiaires.repository;
 
-import com.hikma.stagiaires.model.PasswordResetRequest;
+import com.hikma.stagiaires.model.commun.PasswordResetRequest;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

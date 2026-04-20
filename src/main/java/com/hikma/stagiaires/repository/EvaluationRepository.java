@@ -1,8 +1,8 @@
 // DESTINATION : src/main/java/com/hikma/stagiaires/repository/EvaluationRepository.java
 package com.hikma.stagiaires.repository;
 
-import com.hikma.stagiaires.model.Evaluation;
-import com.hikma.stagiaires.model.EvaluationStatus;
+import com.hikma.stagiaires.model.evaluation.Evaluation;
+import com.hikma.stagiaires.model.evaluation.EvaluationStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

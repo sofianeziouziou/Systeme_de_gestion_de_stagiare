@@ -1,7 +1,7 @@
 // DESTINATION : src/main/java/com/hikma/stagiaires/repository/ProjectSubmissionRepository.java
 package com.hikma.stagiaires.repository;
 
-import com.hikma.stagiaires.model.ProjectSubmission;
+import com.hikma.stagiaires.model.projet.ProjectSubmission;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 // DESTINATION : src/main/java/com/hikma/stagiaires/repository/MessageRepository.java
 package com.hikma.stagiaires.repository;
 
-import com.hikma.stagiaires.model.Message;
+import com.hikma.stagiaires.model.commun.Message;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

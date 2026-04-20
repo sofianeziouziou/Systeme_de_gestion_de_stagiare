@@ -1,8 +1,8 @@
 package com.hikma.stagiaires.dto.onboarding;
 
-import com.hikma.stagiaires.model.CvData;
-import com.hikma.stagiaires.model.EducationLevel;
-import com.hikma.stagiaires.model.OnboardingStep;
+import com.hikma.stagiaires.model.stagiaire.CvData;
+import com.hikma.stagiaires.model.stagiaire.EducationLevel;
+import com.hikma.stagiaires.model.stagiaire.OnboardingStep;
 import lombok.Builder;
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.hikma.stagiaires.repository;
 
-import com.hikma.stagiaires.model.AuditLog;
+import com.hikma.stagiaires.model.commun.AuditLog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

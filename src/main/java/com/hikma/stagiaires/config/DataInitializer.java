@@ -1,6 +1,8 @@
 package com.hikma.stagiaires.config;
 
-import com.hikma.stagiaires.model.*;
+import com.hikma.stagiaires.model.user.AccountStatus;
+import com.hikma.stagiaires.model.user.Role;
+import com.hikma.stagiaires.model.user.User;
 import com.hikma.stagiaires.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

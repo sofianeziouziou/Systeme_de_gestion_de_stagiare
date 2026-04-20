@@ -1,6 +1,6 @@
 package com.hikma.stagiaires.dto.evaluation;
 
-import com.hikma.stagiaires.model.EvaluationStatus;
+import com.hikma.stagiaires.model.evaluation.EvaluationStatus;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 

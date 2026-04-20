@@ -1,9 +1,9 @@
 package com.hikma.stagiaires.repository;
 
-import com.hikma.stagiaires.model.AccountStatus;
-import com.hikma.stagiaires.model.Departement;
-import com.hikma.stagiaires.model.Role;
-import com.hikma.stagiaires.model.User;
+import com.hikma.stagiaires.model.user.AccountStatus;
+import com.hikma.stagiaires.model.commun.Departement;
+import com.hikma.stagiaires.model.user.Role;
+import com.hikma.stagiaires.model.user.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

@@ -4,7 +4,7 @@
 
 package com.hikma.stagiaires.dto.search;
 
-import com.hikma.stagiaires.model.EducationLevel;
+import com.hikma.stagiaires.model.stagiaire.EducationLevel;
 import lombok.Data;
 
 import java.util.List;
