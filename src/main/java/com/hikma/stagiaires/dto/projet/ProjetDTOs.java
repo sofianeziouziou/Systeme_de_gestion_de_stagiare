@@ -118,6 +118,7 @@ public class ProjetDTOs {
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
         private String departement;
+        private String tuteurPhotoUrl;
 
         // ── NOUVEAU : statut acceptation tuteur ───────────────────────────
         private TuteurAcceptation tuteurAcceptation;  // PENDING / ACCEPTED / REFUSED

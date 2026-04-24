@@ -20,11 +20,17 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.hikma.stagiaires.service.commun.FileStorageService;
+import org.springframework.web.multipart.MultipartFile;
+
+
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -37,6 +43,8 @@ public class UserController {
     private final StagiaireService    stagiaireService;
     private final StagiaireRepository stagiaireRepository;   // FIX : ajouté
     private final PasswordEncoder     passwordEncoder;
+    private final FileStorageService fileStorageService;
+
 
     // ── Demandes en attente (RH) ─────────────────────────────────────────────
     @GetMapping("/pending")
@@ -252,6 +260,18 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/me/photo")
+    @Operation(summary = "Upload photo de profil")
+    public ResponseEntity<UserResponse> uploadPhoto(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal User currentUser) {
+
+        String url = fileStorageService.uploadFile(file, "photos/" + currentUser.getId());
+        currentUser.setPhotoUrl(url);
+        userRepository.save(currentUser);
+        return ResponseEntity.ok(toResponse(currentUser));
+    }
+
     // ── Liste tuteurs approuvés ──────────────────────────────────────────────
     @GetMapping("/tuteurs")
     @PreAuthorize("hasRole('RH')")
@@ -312,6 +332,10 @@ public class UserController {
         r.setRole(u.getRole().name());
         r.setAccountStatus(u.getAccountStatus() != null ? u.getAccountStatus().name() : "EN_ATTENTE");
         r.setPhotoUrl(u.getPhotoUrl());
+        if (u.getPhotoUrl() == null && Role.STAGIAIRE.equals(u.getRole())) {
+            stagiaireRepository.findByUserId(u.getId())
+                    .ifPresent(s -> r.setPhotoUrl(s.getPhotoUrl()));
+        }
         r.setDepartement(u.getDepartement() != null ? u.getDepartement().getLabel() : null);
         r.setCreatedAt(u.getCreatedAt() != null ? u.getCreatedAt().toString() : null);
         // ✅ Calcul nbStagiaires si tuteur

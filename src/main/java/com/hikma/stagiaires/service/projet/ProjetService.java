@@ -534,8 +534,10 @@ public class ProjetService {
 
         // Nom tuteur
         if (p.getTuteurId() != null) {
-            userRepository.findById(p.getTuteurId())
-                    .ifPresent(u -> r.setTuteurName(u.getFirstName() + " " + u.getLastName()));
+            userRepository.findById(p.getTuteurId()).ifPresent(u -> {
+                r.setTuteurName(u.getFirstName() + " " + u.getLastName());
+                r.setTuteurPhotoUrl(u.getPhotoUrl());
+            });
         }
 
         // ✅ Stagiaires — triple lookup : stagiaires._id → stagiaires.userId → users._id
